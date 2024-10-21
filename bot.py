@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "Bot is alive"
+    return f"Bot is alive: {uuid.getnode()}"
 
 logger = logging.getLogger(__name__)
 
