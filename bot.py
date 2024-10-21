@@ -1,9 +1,12 @@
 import asyncio
 import logging
+import uuid
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.bot import DefaultBotProperties
 
 from config import Config, load_config
+from config.base import getenv
 from src.handlers import echo
 
 
@@ -21,13 +24,16 @@ async def main():
 
     config: Config = load_config()
 
-    bot: Bot = Bot(token=config.tg_bot.token, parse_mode="HTML")
-    dp: Dispatcher = Dispatcher()
+    if str(uuid.getnode()) in getenv("ALLOWED_MACS"):
+        bot: Bot = Bot(token=config.tg_bot.token, default=DefaultBotProperties(parse_mode='HTML'))
+        dp: Dispatcher = Dispatcher()
 
-    dp.include_router(echo.router)
+        dp.include_router(echo.router)
 
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+        await bot.delete_webhook(drop_pending_updates=True)
+        await dp.start_polling(bot)
+    else:
+        logger.info("User not allowed to start the bot")
 
 
 if __name__ == "__main__":
