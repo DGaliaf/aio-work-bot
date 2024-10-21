@@ -38,6 +38,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
+        print(uuid.getnode())
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logger.info("Bot stopped")
