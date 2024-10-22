@@ -24,7 +24,7 @@ async def main():
 
     config: Config = load_config()
 
-    if str(uuid.getnode()) in getenv("ALLOWED_MACS"):
+    if getenv("BYPASS_CHECK") == "True" or str(uuid.getnode()) in getenv("ALLOWED_MACS"):
         bot: Bot = Bot(token=config.tg_bot.token, default=DefaultBotProperties(parse_mode='HTML'))
         dp: Dispatcher = Dispatcher()
 
