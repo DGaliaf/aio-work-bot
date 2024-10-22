@@ -7,7 +7,7 @@ from aiogram.client.bot import DefaultBotProperties
 
 from config import Config, load_config
 from config.base import getenv
-from src.handlers import echo
+from src.handlers import welcome
 from flask import Flask
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ async def main():
         bot: Bot = Bot(token=config.tg_bot.token, default=DefaultBotProperties(parse_mode='HTML'))
         dp: Dispatcher = Dispatcher()
 
-        dp.include_router(echo.router)
+        dp.include_router(welcome.router)
 
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot)
