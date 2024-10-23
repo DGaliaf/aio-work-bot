@@ -16,6 +16,15 @@ async def checkers(callback: types.CallbackQuery):
     await callback.message.edit_text(text=checkers_msg, reply_markup=checkers_inline_keyboard)
 
 
+@router.callback_query(lambda c: c.data == 'to_checkers')
+async def go_to_main(callback: types.CallbackQuery):
+    checkers_msg = "<b>Доступные чекеры:</b>"
+    for available_checker in __config.available_checkers:
+        checkers_msg += f"\n -{available_checker}"
+
+    await callback.message.edit_text(text=checkers_msg, reply_markup=checkers_inline_keyboard)
+
+
 @router.callback_query(lambda c: c.data == 'to_main_page')
 async def go_to_main(callback: types.CallbackQuery):
     welcome_msg = "Добро пожаловать в <b>All in One бота</b>\n\n Made by <code>DGaliaf (@dkhodos)</code>"
