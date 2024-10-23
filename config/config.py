@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
+import aiogram
 from dotenv import load_dotenv
 
 import os
-
 
 class ImproperlyConfigured(Exception):
     def __init__(self, variable_name: str, *args, **kwargs):

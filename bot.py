@@ -11,19 +11,15 @@ from src.handlers import routers
 
 logger = logging.getLogger(__name__)
 
-
 async def main():
     # TODO: Bypass
-
     logging.basicConfig(
         level=logging.INFO,
         format="%(filename)s:%(lineno)d #%(levelname)-8s "
-        "[%(asctime)s] - %(name)s - %(message)s",
+               "[%(asctime)s] - %(name)s - %(message)s",
     )
 
     config: Config = get_config()
-
-    print(config)
 
     bot: Bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode='HTML'))
     dp: Dispatcher = Dispatcher()
