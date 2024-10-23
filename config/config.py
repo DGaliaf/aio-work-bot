@@ -2,20 +2,45 @@ from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
-from .base import getenv, ImproperlyConfigured
+import os
 
 
-@dataclass
-class TelegramBotConfig:
-    token: str
+class ImproperlyConfigured(Exception):
+    def __init__(self, variable_name: str, *args, **kwargs):
+        self.variable_name = variable_name
+        self.message = f"Set the {variable_name} environment variable."
+        super().__init__(self.message, *args, **kwargs)
+
+
+def getenv(var_name: str, cast_to=str) -> str:
+    try:
+        value = os.environ[var_name]
+        return cast_to(value)
+    except KeyError:
+        raise ImproperlyConfigured(var_name)
+    except ValueError:
+        raise ValueError(f"The value {value} can't be cast to {cast_to}.")
 
 
 @dataclass
 class Config:
-    tg_bot: TelegramBotConfig
+    bot_token: str
+    available_parsers: list[str]
+    available_checkers: list[str]
 
 
-def load_config() -> Config:
-    load_dotenv()
+load_dotenv()
 
-    return Config(tg_bot=TelegramBotConfig(token=getenv("BOT_TOKEN")))
+
+def get_config() -> Config:
+    return Config(
+        bot_token=getenv("BOT_TOKEN"),
+        available_parsers=[
+            "DeWork",
+            "Aspecta",
+        ],
+        available_checkers=[
+            "DeBank",
+            "Solscan (Soon)",
+        ]
+    )
