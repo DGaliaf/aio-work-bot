@@ -141,4 +141,6 @@ cython_debug/
 .idea
 .vscode
 
-*.mmd
+*.mmd!
+
+/src/services/checkers/debank/

@@ -4,7 +4,9 @@ from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
 
 from src.keyboards import debank_inline_keyboard, debank_leave_inline_keyboard
+from src.services.checkers.debank.debank import Debank
 from src.states import DeBank
+from src.utils import is_wallet
 
 router: Router = Router()
 
@@ -22,8 +24,10 @@ async def debank_single_parse(callback: types.CallbackQuery, state: FSMContext):
     msg = ("<b>Одиночный режим DeBank</b>\n\nОтправь кошелек и получи баланс!\nЧтобы выйти из этого режима "
            "нажмите - <b>'Выйти</b>'")
 
+    debank = Debank()
+
     callback_message = await callback.message.answer(text="Отправьте адрес кошелька")
-    await state.set_data({"msg_id": callback_message.message_id})
+    await state.set_data({"msg_id": callback_message.message_id, "debank": debank})
 
     await callback.message.edit_text(text=msg, reply_markup=debank_leave_inline_keyboard)
 
@@ -32,8 +36,24 @@ async def debank_single_parse(callback: types.CallbackQuery, state: FSMContext):
 async def check_single_wallet(message: types.Message, state: FSMContext):
     data = await state.get_data()
 
+    debank: Debank = data.get("debank")
+
     await message.delete()
-    await message.bot.edit_message_text(text=f"Баланс адреса {message.text} - ${random.randint(1, 10000)}", chat_id=message.chat.id, message_id=data.get("msg_id"))
+
+    if not is_wallet(message.text):
+        await message.bot.edit_message_text(text=f"Проверьте правильность адреса - {message.text}", chat_id=message.chat.id, message_id=data.get("msg_id"))
+    else:
+        response = await debank.api("GET", "/user", {"query": {"id": message.text.strip()}})
+
+        user_data = response.get("user")
+        balance = user_data.get("stats").get("usd_value")
+
+        if balance is None:
+            balance = user_data.get("desc").get("usd_value")
+
+        balance = round(balance)
+
+        await message.bot.edit_message_text(text=f"Баланс адреса {message.text} - ${balance}", chat_id=message.chat.id, message_id=data.get("msg_id"))
 
 
 @router.callback_query(lambda c: c.data == 'debank_leave')
